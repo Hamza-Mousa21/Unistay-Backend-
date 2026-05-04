@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 
-import db from "../models/index.js";
+import * as db from "../models/index.js";
 import ownerAuthRoutes from "./routes/ownerAuthRoutes.js";
 
 dotenv.config();
@@ -25,6 +25,7 @@ app.use("/api/owner", ownerAuthRoutes);
 
 const startServer = async () => {
   try {
+    await db.loadModels();
     await db.sequelize.authenticate();
     console.log("Database connected successfully");
 

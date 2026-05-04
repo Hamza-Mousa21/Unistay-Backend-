@@ -1,8 +1,6 @@
+import { Model } from "sequelize";
 
-"use strict";
-const { Model } = require("sequelize");
-
-module.exports = (sequelize, DataTypes) => {
+export default (sequelize, DataTypes) => {
   class Owner extends Model {
     static associate(models) {
       Owner.belongsTo(models.User, {
@@ -33,7 +31,7 @@ module.exports = (sequelize, DataTypes) => {
       modelName: "Owner",
       tableName: "Owner",
       timestamps: false,
-    }
+    },
   );
 
   return Owner;

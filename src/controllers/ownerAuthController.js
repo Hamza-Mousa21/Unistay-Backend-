@@ -1,7 +1,5 @@
 import bcrypt from "bcrypt";
-import db from "../../models/index.js";
-
-const { User, Owner } = db;
+import * as db from "../../models/index.js";
 
 export const registerOwner = async (req, res) => {
   try {
@@ -14,7 +12,7 @@ export const registerOwner = async (req, res) => {
       });
     }
 
-    const existingUser = await User.findOne({
+    const existingUser = await db.User.findOne({
       where: { email },
     });
 
@@ -27,7 +25,7 @@ export const registerOwner = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await User.create({
+    const newUser = await db.User.create({
       first_name,
       last_name,
       email,
@@ -35,7 +33,7 @@ export const registerOwner = async (req, res) => {
       role: "owner",
     });
 
-    await Owner.create({
+    await db.Owner.create({
       user_id: newUser.user_id,
       phone_num: phone_num || null,
       verification: false,
@@ -51,11 +49,11 @@ export const registerOwner = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Register Owner Error:", error);
+    console.error("Register Owner Error:", error.message, error.stack);
 
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: error.message || "Internal server error",
     });
   }
 };
@@ -71,7 +69,7 @@ export const loginOwner = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({
+    const user = await db.User.findOne({
       where: { email },
     });
 
@@ -103,11 +101,11 @@ export const loginOwner = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Login Owner Error:", error);
+    console.error("Login Owner Error:", error.message, error.stack);
 
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: error.message || "Internal server error",
     });
   }
-);
+};
