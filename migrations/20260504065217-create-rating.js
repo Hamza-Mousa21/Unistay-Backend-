@@ -16,10 +16,16 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       rateDate: {
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        allowNull: false,
+        defaultValue: Sequelize.NOW 
       },
       starCount: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        validate:{
+          min:1,
+          max:5
+        }
       },
       comment: {
         type: Sequelize.TEXT
