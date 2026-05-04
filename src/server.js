@@ -1,9 +1,31 @@
-const express=require('express')
-const app=express()
+import express from "express";
+import dotenv from "dotenv";
+import db from "../models/index.js";
+import studentAuthRoutes from "./routes/studentAuthRoutes.js";
 
-const PORT=3000;
+dotenv.config();
 
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-app.listen(PORT,()=>{
-    console.log("Server is running")
-})
+app.use(express.json());
+
+app.use("/api/student", studentAuthRoutes);
+
+const startServer = async () => {
+  try {
+    await db.sequelize.authenticate();
+    console.log("Database connected successfully");
+
+    await db.sequelize.sync({ alter: true });
+    console.log("Database tables synced successfully");
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Server startup error:", error);
+  }
+};
+
+startServer();
