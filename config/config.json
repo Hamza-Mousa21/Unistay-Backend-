@@ -2,7 +2,7 @@
   "development": {
     "username": "unistay",
     "password": "unisecret",
-    "database": "database_development",
+    "database": "unistayDB",
     "host": "127.0.0.1",
     "dialect": "mysql"
   },
