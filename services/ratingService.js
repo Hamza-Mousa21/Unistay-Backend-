@@ -30,6 +30,75 @@ const deleteRating=async(data)=>{
     return true;
 }
 
+const deleteComment=async(data)=>{
+    const rate =await db.Rating.findByPk(data.id)
+    if(!rate){
+        return null
+    }
+
+    await rate.update({
+        comment:null
+    })
+
+
+}
+const deleteIssue=async(data)=>{
+      const rate =await db.Rating.findByPk(data.id)
+    if(!rate){
+        return null
+    }
+
+    await rate.update({
+        issues:null
+    })
+
+
+
+}
+
+
+
+
+const updateRating=async(parameter,data)=>{
+    const rate=await db.Rating.findByPk(parameter.id)
+    if(!rate){
+        return null;
+    }
+    
+    await rate.update(data)
+   
+
+    return true
+}
+
+
+module.exports={
+    getRatings,
+    postRating,
+    deleteRating,
+    deleteComment,
+    deleteIssue,
+    updateRating
+
+}
+
+
+
+
+
+// const deleteStarCount=async()=>{
+    
+//   const rate =await db.Rating.findByPk(data.id)
+//     if(!rate){
+//         return null
+//     }
+
+//     await rate.update({
+//         starCount:null
+//     })
+
+
+// }
 
 // const updateComment=async(data)=>{
 //     const rate=await db.Rating.findByPk(data.id)
@@ -77,28 +146,3 @@ const deleteRating=async(data)=>{
 
 //     return true
 // }
-
-
-const updateRating=async(parameter,data)=>{
-    const rate=await db.Rating.findByPk(parameter.id)
-    if(!rate){
-        return null;
-    }
-    
-    await rate.update(data)
-   
-
-    return true
-}
-
-
-module.exports={
-    getRatings,
-    postRating,
-    deleteRating,
-    // updateComment,
-    // updateIssue,
-    // updateStarCount
-    updateRating
-
-}
