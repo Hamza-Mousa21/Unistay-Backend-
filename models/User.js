@@ -5,6 +5,7 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
+      // A user can have one student profile
       User.hasOne(models.Student, {
         foreignKey: "user_id",
         onDelete: "CASCADE",
@@ -19,23 +20,31 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
+
       first_name: {
         type: DataTypes.STRING(50),
         allowNull: false,
       },
+
       last_name: {
         type: DataTypes.STRING(50),
         allowNull: false,
       },
+
       email: {
         type: DataTypes.STRING(100),
         allowNull: false,
         unique: true,
+        validate: {
+          isEmail: true,
+        },
       },
+
       password: {
         type: DataTypes.STRING(255),
         allowNull: false,
       },
+
       role: {
         type: DataTypes.ENUM("admin", "owner", "student"),
         allowNull: false,

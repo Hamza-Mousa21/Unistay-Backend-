@@ -1,8 +1,13 @@
 import bcrypt from "bcrypt";
-
+import jwt from "jsonwebtoken";
 import db from "../../models/index.js";
 
 const { User, Student } = db;
+
+/**
+ * Register a new student account.
+ * Creates a record in Users table, then creates the related Student profile.
+ */
 export const registerStudent = async (req, res) => {
   try {
     const {
@@ -18,11 +23,20 @@ export const registerStudent = async (req, res) => {
     if (!first_name || !last_name || !email || !password) {
       return res.status(400).json({
         success: false,
-        message: "All required fields must be filled",
+        message: "First name, last name, email, and password are required",
       });
     }
 
-    const existingUser = await User.findOne({ where: { email } });
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters",
+      });
+    }
+
+    const existingUser = await User.findOne({
+      where: { email },
+    });
 
     if (existingUser) {
       return res.status(409).json({
@@ -53,6 +67,8 @@ export const registerStudent = async (req, res) => {
       message: "Student registered successfully",
       user: {
         id: newUser.user_id,
+        first_name: newUser.first_name,
+        last_name: newUser.last_name,
         email: newUser.email,
         role: newUser.role,
       },
@@ -67,6 +83,10 @@ export const registerStudent = async (req, res) => {
   }
 };
 
+/**
+ * Login student account.
+ * Validates credentials, checks student role, and returns JWT token.
+ */
 export const loginStudent = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -78,7 +98,9 @@ export const loginStudent = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({
+      where: { email },
+    });
 
     if (!user || user.role !== "student") {
       return res.status(404).json({
@@ -96,9 +118,21 @@ export const loginStudent = async (req, res) => {
       });
     }
 
+    const token = jwt.sign(
+      {
+        id: user.user_id,
+        role: user.role,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: process.env.JWT_EXPIRES_IN || "1d",
+      },
+    );
+
     return res.status(200).json({
       success: true,
       message: "Student logged in successfully",
+      token,
       user: {
         id: user.user_id,
         first_name: user.first_name,
