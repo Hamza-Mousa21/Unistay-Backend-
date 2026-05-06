@@ -2,7 +2,7 @@
   "name": "index",
   "version": "1.0.0",
   "description": "Anything",
-  "Type": "module",
+  "Type": "commonjs",
   "license": "ISC",
   "author": "",
   "main": "index.js",

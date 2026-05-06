@@ -1,6 +1,10 @@
-import jwt from "jsonwebtoken";
+const jwt = require("jsonwebtoken");
 
-export const protect = (req, res, next) => {
+/**
+ * Verifies that the request has a valid JWT token.
+ * If valid, decoded user data will be attached to req.user.
+ */
+const protect = (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
@@ -26,9 +30,13 @@ export const protect = (req, res, next) => {
   }
 };
 
-export const authorizeRoles = (...roles) => {
+/**
+ * Allows access only to specific user roles.
+ * Example: authorizeRoles("student") or authorizeRoles("owner")
+ */
+const authorizeRoles = (...roles) => {
   return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
+    if (!req.user || !roles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
         message: "You are not allowed to access this route",
@@ -37,4 +45,9 @@ export const authorizeRoles = (...roles) => {
 
     next();
   };
+};
+
+module.exports = {
+  protect,
+  authorizeRoles,
 };

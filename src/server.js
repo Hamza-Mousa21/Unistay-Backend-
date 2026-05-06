@@ -1,7 +1,8 @@
-import express from "express";
-import dotenv from "dotenv";
-import db from "../models/index.js";
-import studentAuthRoutes from "./routes/studentAuthRoutes.js";
+const express = require("express");
+const dotenv = require("dotenv");
+const db = require("../models");
+
+const studentAuthRoutes = require("./routes/studentAuthRoutes");
 
 dotenv.config();
 

@@ -1,10 +1,11 @@
-import express from "express";
-import {
+const express = require("express");
+
+const {
   registerStudent,
   loginStudent,
-} from "../controllers/studentAuthController.js";
+} = require("../controllers/studentAuthController");
 
-import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
+const { protect, authorizeRoles } = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
@@ -14,6 +15,7 @@ const router = express.Router();
 |--------------------------------------------------------------------------
 | POST /register -> Register new student account
 | POST /login    -> Login existing student account
+| GET  /profile  -> Protected student route
 |--------------------------------------------------------------------------
 */
 
@@ -28,4 +30,4 @@ router.get("/profile", protect, authorizeRoles("student"), (req, res) => {
   });
 });
 
-export default router;
+module.exports = router;

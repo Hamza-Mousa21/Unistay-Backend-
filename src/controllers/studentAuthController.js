@@ -1,6 +1,6 @@
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import db from "../../models/index.js";
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const db = require("../../models");
 
 const { User, Student } = db;
 
@@ -8,7 +8,7 @@ const { User, Student } = db;
  * Register a new student account.
  * Creates a record in Users table, then creates the related Student profile.
  */
-export const registerStudent = async (req, res) => {
+const registerStudent = async (req, res) => {
   try {
     const {
       first_name,
@@ -87,7 +87,7 @@ export const registerStudent = async (req, res) => {
  * Login student account.
  * Validates credentials, checks student role, and returns JWT token.
  */
-export const loginStudent = async (req, res) => {
+const loginStudent = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -149,4 +149,9 @@ export const loginStudent = async (req, res) => {
       message: "Internal server error",
     });
   }
+};
+
+module.exports = {
+  registerStudent,
+  loginStudent,
 };
