@@ -1,8 +1,11 @@
-import express from "express";
+const express = require("express");
 
-import { addResidence } from "../controllers/residenceController.js";
-import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
-import upload from "../middlewares/uploadMiddleware.js";
+const { addResidence } = require("../controllers/residenceController");
+const {
+  protect,
+  authorizeRoles,
+} = require("../middlewares/authMiddleware");
+const upload = require("../middlewares/uploadMiddleware");
 
 const router = express.Router();
 
@@ -23,4 +26,4 @@ router.post(
   addResidence
 );
 
-export default router;
+module.exports = router;

@@ -1,5 +1,5 @@
-import multer from "multer";
-import path from "path";
+const multer = require("multer");
+const path = require("path");
 
 /**
  * Configure storage location and file naming for residence images.
@@ -37,4 +37,4 @@ const upload = multer({
   },
 });
 
-export default upload;
+module.exports = upload;

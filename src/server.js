@@ -1,22 +1,22 @@
-import express from "express";
-import dotenv from "dotenv";
-import db from "../models/index.js";
+const express = require("express");
+const dotenv = require("dotenv");
+const db = require("../models");
 
-import ownerAuthRoutes from "./routes/ownerAuthRoutes.js";
-import residenceRoutes from "./routes/residenceRoutes.js";
+const residenceRoutes = require("./routes/residenceRoutes");
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware to parse JSON requests
+// Parse JSON requests
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Allow access to uploaded residence images
+// Allow access to uploaded images
 app.use("/uploads", express.static("uploads"));
 
-// Base route
+// Test route
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
@@ -24,8 +24,7 @@ app.get("/", (req, res) => {
   });
 });
 
-// Routes
-app.use("/api/owner", ownerAuthRoutes);
+// Residence routes
 app.use("/api/residences", residenceRoutes);
 
 /**

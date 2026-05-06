@@ -1,4 +1,4 @@
-import db from "../../models/index.js";
+const db = require("../../models");
 
 const { Residence, ResidenceImage } = db;
 
@@ -7,7 +7,7 @@ const { Residence, ResidenceImage } = db;
  * Only authenticated owners can add residences.
  * The owner_id is taken from the JWT token, not from the request body.
  */
-export const addResidence = async (req, res) => {
+const addResidence = async (req, res) => {
   try {
     const { description, floor_num, address, rent_price, building_num } =
       req.body;
@@ -58,4 +58,8 @@ export const addResidence = async (req, res) => {
       message: "Internal server error",
     });
   }
+};
+
+module.exports = {
+  addResidence,
 };

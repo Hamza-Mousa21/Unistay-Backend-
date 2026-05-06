@@ -5,13 +5,11 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Residence extends Model {
     static associate(models) {
-      // Each residence belongs to one owner
       Residence.belongsTo(models.Owner, {
         foreignKey: "owner_id",
         onDelete: "CASCADE",
       });
 
-      // Each residence can have many images
       Residence.hasMany(models.ResidenceImage, {
         foreignKey: "res_id",
         onDelete: "CASCADE",
