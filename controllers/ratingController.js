@@ -19,7 +19,7 @@ const getRatings=async(req,res)=>{
 const postRating=async(req,res)=>{
     try{
         const rate=await ratingService.postRating(req.body)
-        res.status(200).json({message:"Rate published"})
+        res.status(200).json(rate)
     }
     catch{
         res.status(500).json({message:"Server error"})
@@ -51,7 +51,7 @@ const updateRating=async(req,res)=>{
         if(rate==null){
             return res.status(404).json({message:"Rate not found!"})
         }
-        res.status(201).json({message:"Rating updated"})
+        res.status(201).json(rate)
     }
     catch{
         res.status(500).json({message:"Server error"})
