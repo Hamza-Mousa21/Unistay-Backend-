@@ -1,14 +1,17 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const db = require("../../models");
 
+const db = require("../.../../../../models");
 const { User, Student } = db;
 
 /**
- * Register a new student account.
- * Creates a record in Users table, then creates the related Student profile.
+ * ================= REGISTER STUDENT =================
+ * Creates a new user account and related student profile
  */
+
 const registerStudent = async (req, res) => {
+  const transaction = await db.sequelize.transaction();
+
   try {
     const {
       first_name,
@@ -20,10 +23,19 @@ const registerStudent = async (req, res) => {
       gender,
     } = req.body;
 
+    /* ================= VALIDATION ================= */
+
     if (!first_name || !last_name || !email || !password) {
       return res.status(400).json({
         success: false,
         message: "First name, last name, email, and password are required",
+      });
+    }
+
+    if (!email.includes("@")) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid email format",
       });
     }
 
@@ -34,37 +46,58 @@ const registerStudent = async (req, res) => {
       });
     }
 
+    /* ================= CHECK EMAIL ================= */
+
     const existingUser = await User.findOne({
       where: { email },
     });
 
     if (existingUser) {
+      await transaction.rollback();
+
       return res.status(409).json({
         success: false,
         message: "Email already exists",
       });
     }
 
+    /* ================= HASH PASSWORD ================= */
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await User.create({
-      first_name,
-      last_name,
-      email,
-      password: hashedPassword,
-      role: "student",
-    });
+    /* ================= CREATE USER ================= */
 
-    await Student.create({
-      user_id: newUser.user_id,
-      major: major || null,
-      year_of_study: year_of_study || null,
-      gender: gender || null,
-    });
+    const newUser = await User.create(
+      {
+        first_name,
+        last_name,
+        email,
+        password: hashedPassword,
+        role: "student",
+      },
+      { transaction },
+    );
+
+    /* ================= CREATE STUDENT PROFILE ================= */
+
+    await Student.create(
+      {
+        user_id: newUser.user_id,
+        major: major || null,
+        year_of_study: year_of_study || null,
+        gender: gender || null,
+      },
+      { transaction },
+    );
+
+    await transaction.commit();
+
+    /* ================= RESPONSE ================= */
 
     return res.status(201).json({
       success: true,
       message: "Student registered successfully",
+
       user: {
         id: newUser.user_id,
         first_name: newUser.first_name,
@@ -74,6 +107,8 @@ const registerStudent = async (req, res) => {
       },
     });
   } catch (error) {
+    await transaction.rollback();
+
     console.error("Register Student Error:", error);
 
     return res.status(500).json({
@@ -84,12 +119,15 @@ const registerStudent = async (req, res) => {
 };
 
 /**
- * Login student account.
- * Validates credentials, checks student role, and returns JWT token.
+ * ================= LOGIN STUDENT =================
+ * Validates student credentials and returns JWT token
  */
+
 const loginStudent = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    /* ================= VALIDATION ================= */
 
     if (!email || !password) {
       return res.status(400).json({
@@ -98,16 +136,20 @@ const loginStudent = async (req, res) => {
       });
     }
 
+    /* ================= FIND USER ================= */
+
     const user = await User.findOne({
       where: { email },
     });
 
     if (!user || user.role !== "student") {
-      return res.status(404).json({
+      return res.status(401).json({
         success: false,
-        message: "Student account not found",
+        message: "Invalid email or password",
       });
     }
+
+    /* ================= CHECK PASSWORD ================= */
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
@@ -118,21 +160,29 @@ const loginStudent = async (req, res) => {
       });
     }
 
+    /* ================= GENERATE TOKEN ================= */
+
     const token = jwt.sign(
       {
         id: user.user_id,
         role: user.role,
       },
+
       process.env.JWT_SECRET,
+
       {
         expiresIn: process.env.JWT_EXPIRES_IN || "1d",
       },
     );
 
+    /* ================= RESPONSE ================= */
+
     return res.status(200).json({
       success: true,
       message: "Student logged in successfully",
+
       token,
+
       user: {
         id: user.user_id,
         first_name: user.first_name,

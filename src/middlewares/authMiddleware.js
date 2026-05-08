@@ -1,12 +1,19 @@
 const jwt = require("jsonwebtoken");
 
 /**
- * Verifies that the request has a valid JWT token.
- * If valid, decoded user data will be attached to req.user.
+ * ==================================================
+ * AUTHENTICATION MIDDLEWARE
+ * ==================================================
+ * Verifies JWT token and allows only authenticated users.
  */
+
 const protect = (req, res, next) => {
   try {
+    /* ================= GET TOKEN ================= */
+
     const authHeader = req.headers.authorization;
+
+    /* ================= CHECK TOKEN EXISTS ================= */
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
@@ -15,9 +22,22 @@ const protect = (req, res, next) => {
       });
     }
 
+    /* ================= EXTRACT TOKEN ================= */
+
     const token = authHeader.split(" ")[1];
 
+    /* ================= VERIFY TOKEN ================= */
+
+    if (!process.env.JWT_SECRET) {
+      return res.status(500).json({
+        success: false,
+        message: "JWT_SECRET is not configured",
+      });
+    }
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    /* ================= STORE USER DATA ================= */
 
     req.user = decoded;
 
@@ -31,11 +51,21 @@ const protect = (req, res, next) => {
 };
 
 /**
+ * ==================================================
+ * AUTHORIZATION MIDDLEWARE
+ * ==================================================
  * Allows access only to specific user roles.
- * Example: authorizeRoles("student") or authorizeRoles("owner")
+ *
+ * Example:
+ * authorizeRoles("student")
+ * authorizeRoles("owner")
+ * authorizeRoles("admin")
  */
+
 const authorizeRoles = (...roles) => {
   return (req, res, next) => {
+    /* ================= CHECK USER ROLE ================= */
+
     if (!req.user || !roles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,

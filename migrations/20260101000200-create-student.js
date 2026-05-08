@@ -1,17 +1,20 @@
 "use strict";
 
 /** @type {import("sequelize-cli").Migration} */
+
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("Student", {
+    await queryInterface.createTable("Students", {
       user_id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         allowNull: false,
+
         references: {
           model: "Users",
           key: "user_id",
         },
+
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
       },
@@ -30,10 +33,20 @@ module.exports = {
         type: Sequelize.ENUM("male", "female", "other"),
         allowNull: true,
       },
+
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+      },
+
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+      },
     });
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("Student");
+    await queryInterface.dropTable("Students");
   },
 };

@@ -3,7 +3,7 @@ const express = require("express");
 const {
   registerStudent,
   loginStudent,
-} = require("../controllers/studentAuthController");
+} = require("../controllers/Auth/studentAuthController");
 
 const { protect, authorizeRoles } = require("../middlewares/authMiddleware");
 
@@ -19,15 +19,32 @@ const router = express.Router();
 |--------------------------------------------------------------------------
 */
 
+/* ================= REGISTER ================= */
+
 router.post("/register", registerStudent);
+
+/* ================= LOGIN ================= */
+
 router.post("/login", loginStudent);
 
-router.get("/profile", protect, authorizeRoles("student"), (req, res) => {
-  return res.status(200).json({
-    success: true,
-    message: "Student profile accessed successfully",
-    user: req.user,
-  });
-});
+/* ================= PROTECTED PROFILE ================= */
+
+router.get(
+  "/profile",
+
+  protect,
+
+  authorizeRoles("student"),
+
+  (req, res) => {
+    return res.status(200).json({
+      success: true,
+
+      message: "Student profile accessed successfully",
+
+      user: req.user,
+    });
+  },
+);
 
 module.exports = router;
