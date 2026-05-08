@@ -1,49 +1,77 @@
 import { Model } from "sequelize";
 
 export default (sequelize, DataTypes) => {
+
   class User extends Model {
+
     static associate(models) {
-      // Associations can be defined here
+
+      /**
+       * A user can have one owner profile
+       */
+
       User.hasOne(models.Owner, {
         foreignKey: "user_id",
         onDelete: "CASCADE",
       });
+
     }
   }
 
   User.init(
     {
+
       user_id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
+
       first_name: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(50),
         allowNull: false,
       },
+
       last_name: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(50),
         allowNull: false,
       },
+
       email: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(100),
+        allowNull: false,
         unique: true,
-        allowNull: false,
+
+        validate: {
+          isEmail: true,
+        },
       },
+
       password: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(255),
         allowNull: false,
       },
+
       role: {
-        type: DataTypes.STRING,
+        type: DataTypes.ENUM(
+          "admin",
+          "owner",
+          "student"
+        ),
         allowNull: false,
       },
+
     },
     {
+
       sequelize,
+
       modelName: "User",
-      tableName: "User",
+
+      tableName: "Users",
+
+      timestamps: false,
+
     },
   );
 
