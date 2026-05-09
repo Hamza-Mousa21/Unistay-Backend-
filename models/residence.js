@@ -5,15 +5,29 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Residence extends Model {
     static associate(models) {
-      Residence.belongsTo(models.Owner, {
-        foreignKey: "owner_id",
-        onDelete: "CASCADE",
-      });
+      // Residence.belongsTo(models.Owner, {
+      //   foreignKey: "owner_id",
+      //   onDelete: "CASCADE",
+      // });
 
       Residence.hasMany(models.ResidenceImage, {
         foreignKey: "res_id",
         onDelete: "CASCADE",
       });
+
+      Residence.hasMany(models.Rating, {
+        foreignKey: "res_id",
+        onDelete: "CASCADE",
+      });
+      
+
+      Residence.hasMany(models.WishList,{
+        foreignKey:"res_id",
+        onDelete:"CASCADE"
+      })
+
+
+
     }
   }
 

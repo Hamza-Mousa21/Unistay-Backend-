@@ -14,29 +14,17 @@ module.exports = (sequelize, DataTypes) => {
 
   ResidenceImage.init(
     {
-      image_id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-      },
-
-      image_url: {
-        type: DataTypes.STRING(500),
-        allowNull: false,
-      },
-
-      res_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
+        image_id: DataTypes.INTEGER,
+        image_url: DataTypes.STRING(500),
+        res_id: DataTypes.INTEGER,
     },
     {
-      sequelize,
-      modelName: "ResidenceImage",
-      tableName: "Residence_Image",
-      timestamps: false,
+        sequelize,
+        modelName: "ResidenceImage",
+        tableName: "Residence_Image",
+        timestamps: false,
     }
-  );
+);
 
   return ResidenceImage;
 };

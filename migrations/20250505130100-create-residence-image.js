@@ -1,75 +1,33 @@
 "use strict";
 
-const { Model } = require("sequelize");
-
-module.exports = (sequelize, DataTypes) => {
-  class Residence extends Model {
-    static associate(models) {
-      Residence.belongsTo(models.Owner, {
-        foreignKey: "owner_id",
-        onDelete: "CASCADE",
-      });
-
-      Residence.hasMany(models.ResidenceImage, {
-        foreignKey: "res_id",
-        onDelete: "CASCADE",
-      });
-    }
-  }
-
-  Residence.init(
-    {
-      res_id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
+module.exports = {
+  async up(queryInterface, Sequelize) {
+    await queryInterface.createTable("Residence_Image", {
+      image_id: {
+        allowNull: false,
         autoIncrement: true,
+        primaryKey: true,
+        type: Sequelize.INTEGER,
       },
 
-      description: {
-        type: DataTypes.TEXT,
-        allowNull: true,
-      },
-
-      is_available: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true,
-      },
-
-      floor_num: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-      },
-
-      address: {
-        type: DataTypes.STRING(255),
+      image_url: {
+        type: Sequelize.STRING(500),
         allowNull: false,
       },
 
-      rent_price: {
-        type: DataTypes.DECIMAL(10, 2),
+      res_id: {
+        type: Sequelize.INTEGER,
         allowNull: false,
-        validate: {
-          min: 1,
+        references: {
+          model: "Residence", 
+          key: "res_id",
         },
+        onDelete: "CASCADE",
       },
+    });
+  },
 
-      building_num: {
-        type: DataTypes.STRING(50),
-        allowNull: true,
-      },
-
-      owner_id: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-    },
-    {
-      sequelize,
-      modelName: "Residence",
-      tableName: "Residence",
-      timestamps: false,
-    }
-  );
-
-  return Residence;
+  async down(queryInterface, Sequelize) {
+    await queryInterface.dropTable("Residence_Image");
+  },
 };

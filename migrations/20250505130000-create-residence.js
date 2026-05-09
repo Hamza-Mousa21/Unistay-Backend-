@@ -45,10 +45,10 @@ module.exports = {
       owner_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: {
-          model: "Owner",
-          key: "user_id",
-        },
+        // references: {
+        //   model: "Owner",
+        //   key: "user_id",
+        // },
         onUpdate: "CASCADE",
         onDelete: "CASCADE",
       },

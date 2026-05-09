@@ -12,8 +12,13 @@ module.exports = {
       userId: {
         type: Sequelize.INTEGER
       },
-      residentId: {
-        type: Sequelize.INTEGER
+      res_id: {
+        type: Sequelize.INTEGER,
+        references:{
+          model:"Residence",
+          key:"res_id"
+        },
+        onDelete:"CASCADE"
       },
       rateDate: {
         type: Sequelize.DATE,
