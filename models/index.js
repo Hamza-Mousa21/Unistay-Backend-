@@ -1,56 +1,89 @@
-import { Model } from "sequelize";
+"use strict";
 
-export default (sequelize, DataTypes) => {
+const fs = require("fs");
 
-  class Owner extends Model {
+const path = require("path");
 
-    static associate(models) {
+const Sequelize = require("sequelize");
 
-      /**
-       * Each owner belongs to one user account
-       */
+const process = require("process");
 
-      Owner.belongsTo(models.User, {
-        foreignKey: "user_id",
-        onDelete: "CASCADE",
-      });
+/**
+ * ==================================================
+ * DATABASE CONFIGURATION
+ * ==================================================
+ */
 
-    }
-  }
+const basename = path.basename(__filename);
 
-  Owner.init(
-    {
+const env = process.env.NODE_ENV || "development";
 
-      user_id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        allowNull: false,
-      },
+const config = require("../config/config.json")[env];
 
-      phone_num: {
-        type: DataTypes.STRING(20),
-        allowNull: false,
-      },
+/**
+ * ==================================================
+ * DATABASE OBJECT
+ * ==================================================
+ */
 
-      verification: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
+const db = {};
 
-    },
-    {
+/**
+ * ==================================================
+ * SEQUELIZE CONNECTION
+ * ==================================================
+ */
 
+const sequelize = new Sequelize(
+  config.database,
+  config.username,
+  config.password,
+  config,
+);
+
+/**
+ * ==================================================
+ * LOAD ALL MODELS
+ * ==================================================
+ */
+
+fs.readdirSync(__dirname)
+
+  .filter((file) => {
+    return (
+      file.indexOf(".") !== 0 && file !== basename && file.slice(-3) === ".js"
+    );
+  })
+
+  .forEach((file) => {
+    const model = require(path.join(__dirname, file))(
       sequelize,
+      Sequelize.DataTypes,
+    );
 
-      modelName: "Owner",
+    db[model.name] = model;
+  });
 
-      tableName: "Owner",
+/**
+ * ==================================================
+ * EXECUTE MODEL ASSOCIATIONS
+ * ==================================================
+ */
 
-      timestamps: false,
+Object.keys(db).forEach((modelName) => {
+  if (db[modelName].associate) {
+    db[modelName].associate(db);
+  }
+});
 
-    }
-  );
+/**
+ * ==================================================
+ * EXPORT DATABASE & SEQUELIZE
+ * ==================================================
+ */
 
-  return Owner;
-};
+db.sequelize = sequelize;
+
+db.Sequelize = Sequelize;
+
+module.exports = db;

@@ -1,10 +1,12 @@
-import express from "express";
-import dotenv from "dotenv";
-import cors from "cors";
+const express = require("express");
 
-import * as db from "../models/index.js";
+const dotenv = require("dotenv");
 
-import ownerAuthRoutes from "./routes/ownerAuthRoutes.js";
+const cors = require("cors");
+
+const db = require("../models");
+
+const ownerAuthRoutes = require("./routes/ownerAuthRoutes");
 
 dotenv.config();
 
@@ -25,7 +27,7 @@ app.use(express.json());
 app.use(
   express.urlencoded({
     extended: true,
-  })
+  }),
 );
 
 /**
@@ -35,12 +37,11 @@ app.use(
  */
 
 app.get("/", (req, res) => {
-
   return res.status(200).json({
     success: true,
+
     message: "UniStay backend is running",
   });
-
 });
 
 /**
@@ -49,10 +50,7 @@ app.get("/", (req, res) => {
  * ==================================================
  */
 
-app.use(
-  "/api/owner",
-  ownerAuthRoutes
-);
+app.use("/api/owner", ownerAuthRoutes);
 
 /**
  * ==================================================
@@ -61,38 +59,20 @@ app.use(
  */
 
 const startServer = async () => {
-
   try {
-
-    await db.loadModels();
-
     await db.sequelize.authenticate();
 
-    console.log(
-      "Database connected successfully"
-    );
+    console.log("Database connected successfully");
 
     await db.sequelize.sync();
 
-    console.log(
-      "Database tables synced successfully"
-    );
+    console.log("Database tables synced successfully");
 
     app.listen(PORT, () => {
-
-      console.log(
-        `Server running on port ${PORT}`
-      );
-
+      console.log(`Server running on port ${PORT}`);
     });
-
   } catch (error) {
-
-    console.error(
-      "Server startup error:",
-      error
-    );
-
+    console.error("Server startup error:", error);
   }
 };
 

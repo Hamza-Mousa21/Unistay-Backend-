@@ -1,12 +1,14 @@
-import { Model } from "sequelize";
+"use strict";
 
-export default (sequelize, DataTypes) => {
+const { Model } = require("sequelize");
 
+module.exports = (sequelize, DataTypes) => {
   class User extends Model {
-
     static associate(models) {
-
       /**
+       * ==================================================
+       * USER RELATIONSHIPS
+       * ==================================================
        * A user can have one owner profile
        */
 
@@ -14,32 +16,36 @@ export default (sequelize, DataTypes) => {
         foreignKey: "user_id",
         onDelete: "CASCADE",
       });
-
     }
   }
 
   User.init(
     {
-
       user_id: {
         type: DataTypes.INTEGER,
+
         primaryKey: true,
+
         autoIncrement: true,
       },
 
       first_name: {
         type: DataTypes.STRING(50),
+
         allowNull: false,
       },
 
       last_name: {
         type: DataTypes.STRING(50),
+
         allowNull: false,
       },
 
       email: {
         type: DataTypes.STRING(100),
+
         allowNull: false,
+
         unique: true,
 
         validate: {
@@ -49,21 +55,18 @@ export default (sequelize, DataTypes) => {
 
       password: {
         type: DataTypes.STRING(255),
+
         allowNull: false,
       },
 
       role: {
-        type: DataTypes.ENUM(
-          "admin",
-          "owner",
-          "student"
-        ),
+        type: DataTypes.ENUM("admin", "owner", "student"),
+
         allowNull: false,
       },
-
     },
-    {
 
+    {
       sequelize,
 
       modelName: "User",
@@ -71,7 +74,6 @@ export default (sequelize, DataTypes) => {
       tableName: "Users",
 
       timestamps: false,
-
     },
   );
 

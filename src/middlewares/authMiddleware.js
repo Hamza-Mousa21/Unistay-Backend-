@@ -1,54 +1,67 @@
-import express from "express";
+const jwt = require("jsonwebtoken");
 
-import {
-  registerOwner,
-  loginOwner,
-} from "../controllers/Auth/ownerAuthController.js";
+/**
+ * ==================================================
+ * PROTECT MIDDLEWARE
+ * ==================================================
+ * Verifies JWT token
+ */
 
-import {
-  protect,
-  authorizeRoles,
-} from "../middlewares/authMiddleware.js";
+const protect = async (req, res, next) => {
+  try {
+    let token;
 
-const router = express.Router();
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+    ) {
+      token = req.headers.authorization.split(" ")[1];
+    }
 
-/*
-|--------------------------------------------------------------------------
-| Owner Authentication Routes
-|--------------------------------------------------------------------------
-| POST /register -> Register new owner account
-| POST /login    -> Login existing owner account
-| GET  /profile  -> Protected owner route
-|--------------------------------------------------------------------------
-*/
+    if (!token) {
+      return res.status(401).json({
+        success: false,
 
-router.post(
-  "/register",
-  registerOwner
-);
+        message: "Not authorized, no token",
+      });
+    }
 
-router.post(
-  "/login",
-  loginOwner
-);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-router.get(
-  "/profile",
+    req.user = decoded;
 
-  protect,
+    next();
+  } catch (error) {
+    return res.status(401).json({
+      success: false,
 
-  authorizeRoles("owner"),
-
-  (req, res) => {
-
-    return res.status(200).json({
-      success: true,
-      message:
-        "Owner profile accessed successfully",
-
-      user: req.user,
+      message: "Not authorized, invalid token",
     });
   }
-);
+};
 
-export default router;
+/**
+ * ==================================================
+ * ROLE AUTHORIZATION
+ * ==================================================
+ * Restricts access based on user role
+ */
+
+const authorizeRoles = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({
+        success: false,
+
+        message: "Access denied",
+      });
+    }
+
+    next();
+  };
+};
+
+module.exports = {
+  protect,
+  authorizeRoles,
+};

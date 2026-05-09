@@ -3,11 +3,8 @@
 const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
-
   class Owner extends Model {
-
     static associate(models) {
-
       /**
        * Each owner belongs to one user account
        */
@@ -16,13 +13,11 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "user_id",
         onDelete: "CASCADE",
       });
-
     }
   }
 
   Owner.init(
     {
-
       user_id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -39,10 +34,8 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: false,
       },
-
     },
     {
-
       sequelize,
 
       modelName: "Owner",
@@ -50,8 +43,7 @@ module.exports = (sequelize, DataTypes) => {
       tableName: "Owner",
 
       timestamps: false,
-
-    }
+    },
   );
 
   return Owner;

@@ -1,36 +1,33 @@
-import express from "express";
+const express = require("express");
 
-import {
+const {
   registerOwner,
   loginOwner,
-} from "../controllers/Auth/ownerAuthController.js";
+} = require("../controllers/Auth/ownerAuthController");
 
-import {
-  protect,
-  authorizeRoles,
-} from "../middlewares/authMiddleware.js";
+const { protect, authorizeRoles } = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
-/*
-|--------------------------------------------------------------------------
-| Owner Authentication Routes
-|--------------------------------------------------------------------------
-| POST /register -> Register new owner account
-| POST /login    -> Login existing owner account
-| GET  /profile  -> Protected owner route
-|--------------------------------------------------------------------------
-*/
+/**
+ * ==================================================
+ * OWNER AUTHENTICATION ROUTES
+ * ==================================================
+ * POST /register -> Register new owner account
+ * POST /login    -> Login existing owner account
+ * GET  /profile  -> Protected owner route
+ * ==================================================
+ */
 
-router.post(
-  "/register",
-  registerOwner
-);
+/* ================= REGISTER OWNER ================= */
 
-router.post(
-  "/login",
-  loginOwner
-);
+router.post("/register", registerOwner);
+
+/* ================= LOGIN OWNER ================= */
+
+router.post("/login", loginOwner);
+
+/* ================= OWNER PROFILE ================= */
 
 router.get(
   "/profile",
@@ -40,15 +37,14 @@ router.get(
   authorizeRoles("owner"),
 
   (req, res) => {
-
     return res.status(200).json({
       success: true,
-      message:
-        "Owner profile accessed successfully",
+
+      message: "Owner profile accessed successfully",
 
       user: req.user,
     });
-  }
+  },
 );
 
-export default router;
+module.exports = router;
