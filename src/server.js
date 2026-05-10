@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // const express = require("express");
 // const cors = require("cors");
 // const dotenv = require("dotenv");
@@ -72,13 +73,25 @@ const db=require('../models')
 const cors =require('cors')
 const Ratingrouter=require('../routes/ratingRoutes')
 const wishListRouter=require('../routes/wishListRoutes')
+=======
+const express = require("express");
 
+const dotenv = require("dotenv");
+>>>>>>> Sewar-Backend
 
+const cors = require("cors");
+
+<<<<<<< HEAD
 const dotenv = require("dotenv");
 
 const db = require("../models");
 
 const studentAuthRoutes = require("../routes/studentAuthRoutes");
+=======
+const db = require("../models");
+
+const ownerAuthRoutes = require("../routes/ownerAuthRoutes");
+>>>>>>> Sewar-Backend
 
 dotenv.config();
 
@@ -86,6 +99,7 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 
+<<<<<<< HEAD
 /* ==================================================
    MIDDLEWARES
 ================================================== */
@@ -100,10 +114,39 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.status(200).json({
     success: true,
+=======
+/**
+ * ==================================================
+ * GLOBAL MIDDLEWARES
+ * ==================================================
+ */
+
+app.use(cors());
+
+app.use(express.json());
+
+app.use(
+  express.urlencoded({
+    extended: true,
+  }),
+);
+
+/**
+ * ==================================================
+ * BASE ROUTE
+ * ==================================================
+ */
+
+app.get("/", (req, res) => {
+  return res.status(200).json({
+    success: true,
+
+>>>>>>> Sewar-Backend
     message: "UniStay backend is running",
   });
 });
 
+<<<<<<< HEAD
 /* ==================================================
    ROUTES
 ================================================== */
@@ -118,26 +161,51 @@ app.use("/api/student", studentAuthRoutes);
 /**
  * Starts Express server after
  * confirming database connection.
+=======
+/**
+ * ==================================================
+ * OWNER AUTH ROUTES
+ * ==================================================
+ */
+
+app.use("/api/owner", ownerAuthRoutes);
+
+/**
+ * ==================================================
+ * START SERVER
+ * ==================================================
+>>>>>>> Sewar-Backend
  */
 
 const startServer = async () => {
   try {
+<<<<<<< HEAD
     /* ================= DATABASE CONNECTION ================= */
 
+=======
+>>>>>>> Sewar-Backend
     await db.sequelize.authenticate();
 
     console.log("Database connected successfully");
 
+<<<<<<< HEAD
     /* ================= SYNC DATABASE ================= */
 
+=======
+>>>>>>> Sewar-Backend
     await db.sequelize.sync();
 
     console.log("Database tables synced successfully");
 
+<<<<<<< HEAD
     /* ================= START SERVER ================= */
 
     app.listen(PORT, () => {
       console.log(` Server running on port ${PORT}`);
+=======
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+>>>>>>> Sewar-Backend
     });
   } catch (error) {
     console.error("Server startup error:", error);
