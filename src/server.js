@@ -6,7 +6,7 @@ const cors = require("cors");
 
 const db = require("../models");
 
-const ownerAuthRoutes = require("./routes/ownerAuthRoutes");
+const ownerAuthRoutes = require("../routes/ownerAuthRoutes");
 
 dotenv.config();
 
