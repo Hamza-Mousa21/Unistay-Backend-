@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   WishList.init({
     userId: DataTypes.INTEGER,
-    residentId: DataTypes.INTEGER,
+    res_id: DataTypes.INTEGER,
     liked: DataTypes.BOOLEAN
   }, {
     sequelize,

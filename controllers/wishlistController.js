@@ -15,7 +15,7 @@ const getAllWishedList=async(req,res)=>{
 
 const addToWishlist=async(req,res)=>{
     try{
-        const wish=await wishlistService.addToWishLost(req.body)
+        const wish=await wishlistService.addToWishList(req.body)
         res.status(201).json({message:"resident liked"})
     }
     catch{
@@ -25,11 +25,18 @@ const addToWishlist=async(req,res)=>{
 
 
 const removeFromWishlist=async(req,res)=>{
-    const wish=await wishlistService.removeFromWishList(req.params)
-    if(wish===null){
-        res.status(404).json({message:"didn't remove ir"})
+    try{
+        const wish=await wishlistService.removeFromWishList(req.params)
+        if(wish===null){
+            return res.status(404).json({message:"didn't remove ir"})
+        }
+        res.status(200).json({message:"unliked the resident"})
+        }
+    catch(error){
+        console.error(error)
+        res.status(500).json({message:"Server error"})
     }
-    res.status(200).json({message:"unliked the resident"})
+
 }
 
 module.exports={

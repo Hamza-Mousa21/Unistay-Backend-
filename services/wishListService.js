@@ -6,7 +6,7 @@ const getWishedList=async()=>{
 }
 
 
-const addToWishLost=async(Data)=>{
+const addToWishList=async(Data)=>{
     const wish =await db.WishList.create({
         liked:Data.liked,
         userId:Data.userId,
@@ -28,6 +28,6 @@ const removeFromWishList=async(Data)=>{
 
 module.exports={
     getWishedList,
-    addToWishLost,
+    addToWishList,
     removeFromWishList
 }
