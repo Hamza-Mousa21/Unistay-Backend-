@@ -4,7 +4,7 @@ const dotenv = require("dotenv");
 
 const db = require("../models");
 
-const studentAuthRoutes = require("./routes/studentAuthRoutes");
+const studentAuthRoutes = require("../routes/studentAuthRoutes");
 
 dotenv.config();
 
