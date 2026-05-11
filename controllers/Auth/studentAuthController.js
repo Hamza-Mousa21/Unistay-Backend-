@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const db = require("../../models");
+
 const { User, Student } = db;
 
 /**
@@ -28,6 +29,7 @@ const registerStudent = async (req, res) => {
     if (!first_name || !last_name || !email || !password) {
       return res.status(400).json({
         success: false,
+
         message: "First name, last name, email, and password are required",
       });
     }
@@ -35,6 +37,7 @@ const registerStudent = async (req, res) => {
     if (!email.includes("@")) {
       return res.status(400).json({
         success: false,
+
         message: "Invalid email format",
       });
     }
@@ -42,6 +45,7 @@ const registerStudent = async (req, res) => {
     if (password.length < 6) {
       return res.status(400).json({
         success: false,
+
         message: "Password must be at least 6 characters",
       });
     }
@@ -57,6 +61,7 @@ const registerStudent = async (req, res) => {
 
       return res.status(409).json({
         success: false,
+
         message: "Email already exists",
       });
     }
@@ -75,6 +80,7 @@ const registerStudent = async (req, res) => {
         password: hashedPassword,
         role: "student",
       },
+
       { transaction },
     );
 
@@ -83,10 +89,14 @@ const registerStudent = async (req, res) => {
     await Student.create(
       {
         user_id: newUser.user_id,
+
         major: major || null,
+
         year_of_study: year_of_study || null,
+
         gender: gender || null,
       },
+
       { transaction },
     );
 
@@ -96,13 +106,18 @@ const registerStudent = async (req, res) => {
 
     return res.status(201).json({
       success: true,
+
       message: "Student registered successfully",
 
       user: {
         id: newUser.user_id,
+
         first_name: newUser.first_name,
+
         last_name: newUser.last_name,
+
         email: newUser.email,
+
         role: newUser.role,
       },
     });
@@ -113,6 +128,7 @@ const registerStudent = async (req, res) => {
 
     return res.status(500).json({
       success: false,
+
       message: "Internal server error",
     });
   }
@@ -132,6 +148,7 @@ const loginStudent = async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({
         success: false,
+
         message: "Email and password are required",
       });
     }
@@ -145,6 +162,7 @@ const loginStudent = async (req, res) => {
     if (!user || user.role !== "student") {
       return res.status(401).json({
         success: false,
+
         message: "Invalid email or password",
       });
     }
@@ -156,6 +174,7 @@ const loginStudent = async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
+
         message: "Invalid email or password",
       });
     }
@@ -165,6 +184,7 @@ const loginStudent = async (req, res) => {
     const token = jwt.sign(
       {
         id: user.user_id,
+
         role: user.role,
       },
 
@@ -179,15 +199,20 @@ const loginStudent = async (req, res) => {
 
     return res.status(200).json({
       success: true,
+
       message: "Student logged in successfully",
 
       token,
 
       user: {
         id: user.user_id,
+
         first_name: user.first_name,
+
         last_name: user.last_name,
+
         email: user.email,
+
         role: user.role,
       },
     });
@@ -196,6 +221,146 @@ const loginStudent = async (req, res) => {
 
     return res.status(500).json({
       success: false,
+
+      message: "Internal server error",
+    });
+  }
+};
+
+/**
+ * ================= GET STUDENT PROFILE =================
+ * Returns logged in student profile
+ */
+
+const getStudentProfile = async (req, res) => {
+  try {
+    const student = await Student.findOne({
+      where: {
+        user_id: req.user.id,
+      },
+
+      include: [
+        {
+          model: User,
+
+          attributes: ["user_id", "first_name", "last_name", "email", "role"],
+        },
+      ],
+    });
+
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+
+        message: "Student not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+
+      student,
+    });
+  } catch (error) {
+    console.error("Get Student Profile Error:", error);
+
+    return res.status(500).json({
+      success: false,
+
+      message: "Internal server error",
+    });
+  }
+};
+
+/**
+ * ================= UPDATE STUDENT PROFILE =================
+ * Updates logged in student profile
+ */
+
+const updateStudentProfile = async (req, res) => {
+  try {
+    const { first_name, last_name, major, year_of_study, gender } = req.body;
+
+    const user = await User.findByPk(req.user.id);
+
+    const student = await Student.findOne({
+      where: {
+        user_id: req.user.id,
+      },
+    });
+
+    if (!user || !student) {
+      return res.status(404).json({
+        success: false,
+
+        message: "Student not found",
+      });
+    }
+
+    /* ================= UPDATE USER ================= */
+
+    await user.update({
+      first_name: first_name || user.first_name,
+
+      last_name: last_name || user.last_name,
+    });
+
+    /* ================= UPDATE STUDENT ================= */
+
+    await student.update({
+      major: major || student.major,
+
+      year_of_study: year_of_study || student.year_of_study,
+
+      gender: gender || student.gender,
+    });
+
+    return res.status(200).json({
+      success: true,
+
+      message: "Student profile updated successfully",
+    });
+  } catch (error) {
+    console.error("Update Student Error:", error);
+
+    return res.status(500).json({
+      success: false,
+
+      message: "Internal server error",
+    });
+  }
+};
+
+/**
+ * ================= DELETE STUDENT PROFILE =================
+ * Deletes logged in student account
+ */
+
+const deleteStudentProfile = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+
+        message: "Student not found",
+      });
+    }
+
+    await user.destroy();
+
+    return res.status(200).json({
+      success: true,
+
+      message: "Student account deleted successfully",
+    });
+  } catch (error) {
+    console.error("Delete Student Error:", error);
+
+    return res.status(500).json({
+      success: false,
+
       message: "Internal server error",
     });
   }
@@ -204,4 +369,7 @@ const loginStudent = async (req, res) => {
 module.exports = {
   registerStudent,
   loginStudent,
+  getStudentProfile,
+  updateStudentProfile,
+  deleteStudentProfile,
 };
