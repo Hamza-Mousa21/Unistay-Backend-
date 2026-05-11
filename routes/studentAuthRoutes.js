@@ -3,31 +3,47 @@ const express = require("express");
 const {
   registerStudent,
   loginStudent,
+  getStudentProfile,
+  updateStudentProfile,
+  deleteStudentProfile,
 } = require("../controllers/Auth/studentAuthController");
 
-const { protect, authorizeRoles } = require("../middlewares/authMiddleware");
+const {
+  protect,
+  authorizeRoles,
+} = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
-/*
-|--------------------------------------------------------------------------
-| Student Authentication Routes
-|--------------------------------------------------------------------------
-| POST /register -> Register new student account
-| POST /login    -> Login existing student account
-| GET  /profile  -> Protected student route
-|--------------------------------------------------------------------------
-*/
+/**
+ * ==================================================
+ * STUDENT AUTHENTICATION ROUTES
+ * ==================================================
+ * POST   /register -> Register new student
+ * POST   /login    -> Login student
+ * GET    /profile  -> Get student profile
+ * PUT    /profile  -> Update student profile
+ * DELETE /profile  -> Delete student account
+ * ==================================================
+ */
 
 /* ================= REGISTER ================= */
 
-router.post("/register", registerStudent);
+router.post(
+  "/register",
+
+  registerStudent
+);
 
 /* ================= LOGIN ================= */
 
-router.post("/login", loginStudent);
+router.post(
+  "/login",
 
-/* ================= PROTECTED PROFILE ================= */
+  loginStudent
+);
+
+/* ================= GET PROFILE ================= */
 
 router.get(
   "/profile",
@@ -36,15 +52,31 @@ router.get(
 
   authorizeRoles("student"),
 
-  (req, res) => {
-    return res.status(200).json({
-      success: true,
+  getStudentProfile
+);
 
-      message: "Student profile accessed successfully",
+/* ================= UPDATE PROFILE ================= */
 
-      user: req.user,
-    });
-  },
+router.put(
+  "/profile",
+
+  protect,
+
+  authorizeRoles("student"),
+
+  updateStudentProfile
+);
+
+/* ================= DELETE PROFILE ================= */
+
+router.delete(
+  "/profile",
+
+  protect,
+
+  authorizeRoles("student"),
+
+  deleteStudentProfile
 );
 
 module.exports = router;
