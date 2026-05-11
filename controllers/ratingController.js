@@ -1,16 +1,24 @@
 const ratingService=require('../services/ratingService')
-
+ const db=require('../models')
 
 const getRatings=async(req,res)=>{
     try{
-    const rate=await ratingService.getRatings()
-    if(rate.lengh===0){
-       return res.status(200).json({message:"No ratings yet"})
+        const residence=await db.Residence.findByPk(req.params.residenceId)
+        if (!residence){
+            return res.status(401).json({message:"Residence is not found!"})
+        }  
+        console.log(1)
+        const rate=await ratingService.getRatings()
+        if(rate.length===0){
+            console.log(2)
+            return res.status(200).json({message:"No ratings yet"})
+        }
+        console.log(3)
+        res.status(200).json(rate)
     }
-    res.status(200).json(rate)
-    }
-    catch{
-        res.status(500).json({message:"Server error"})
+    catch(error){
+        console.error(error)
+        res.status(500).json({message:"Server ERRRR"})
     }   
         
 }

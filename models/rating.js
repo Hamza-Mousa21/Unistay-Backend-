@@ -9,12 +9,16 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey:"res_id",
         onDelete:"CASCADE"
       })
+      Rating.belongsTo(models.Student,{
+        foreignKey:"user_id",
+        onDelete:"CASCADE"
+      })
       //Wating for the stu model to be initialized
 
     }
   }
   Rating.init({
-    userId: DataTypes.INTEGER,
+    user_id: DataTypes.INTEGER,
     res_id: DataTypes.INTEGER,
     rateDate: DataTypes.DATE,
     starCount: DataTypes.INTEGER,

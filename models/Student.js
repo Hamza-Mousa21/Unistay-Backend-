@@ -10,6 +10,14 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: "user_id",
         onDelete: "CASCADE",
       });
+      Student.hasMany(models.Rating,{
+        foreignKey:"user_id",
+        onDelete: "CASCADE"
+      })
+      Student.hasMany(models.WishList,{
+        foreignKey:"user_id",
+        onDelete:"CASCADE"
+      })
     }
   }
 
