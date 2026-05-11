@@ -3,9 +3,15 @@ const express = require("express");
 const {
   registerOwner,
   loginOwner,
+  getOwnerProfile,
+  updateOwnerProfile,
+  deleteOwnerProfile,
 } = require("../controllers/Auth/ownerAuthController");
 
-const { protect, authorizeRoles } = require("../middlewares/authMiddleware");
+const {
+  protect,
+  authorizeRoles,
+} = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
@@ -13,21 +19,31 @@ const router = express.Router();
  * ==================================================
  * OWNER AUTHENTICATION ROUTES
  * ==================================================
- * POST /register -> Register new owner account
- * POST /login    -> Login existing owner account
- * GET  /profile  -> Protected owner route
+ * POST   /register -> Register new owner
+ * POST   /login    -> Login owner
+ * GET    /profile  -> Get owner profile
+ * PUT    /profile  -> Update owner profile
+ * DELETE /profile  -> Delete owner account
  * ==================================================
  */
 
 /* ================= REGISTER OWNER ================= */
 
-router.post("/register", registerOwner);
+router.post(
+  "/register",
+
+  registerOwner
+);
 
 /* ================= LOGIN OWNER ================= */
 
-router.post("/login", loginOwner);
+router.post(
+  "/login",
 
-/* ================= OWNER PROFILE ================= */
+  loginOwner
+);
+
+/* ================= GET OWNER PROFILE ================= */
 
 router.get(
   "/profile",
@@ -36,15 +52,31 @@ router.get(
 
   authorizeRoles("owner"),
 
-  (req, res) => {
-    return res.status(200).json({
-      success: true,
+  getOwnerProfile
+);
 
-      message: "Owner profile accessed successfully",
+/* ================= UPDATE OWNER PROFILE ================= */
 
-      user: req.user,
-    });
-  },
+router.put(
+  "/profile",
+
+  protect,
+
+  authorizeRoles("owner"),
+
+  updateOwnerProfile
+);
+
+/* ================= DELETE OWNER PROFILE ================= */
+
+router.delete(
+  "/profile",
+
+  protect,
+
+  authorizeRoles("owner"),
+
+  deleteOwnerProfile
 );
 
 module.exports = router;
