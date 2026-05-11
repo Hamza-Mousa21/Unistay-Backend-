@@ -19,7 +19,7 @@ app.use(express.json())
 
 
 app.use('/residence/:residenceId/Ratings',Ratingrouter)
-app.use('/student/studentId/wishlist',wishListRouter)
+app.use('/student/:studentId/residence/:residenceId/wishlist',wishListRouter)
 app.use('/student',studentRouter)
 app.use('/owner',ownerRouter)
 
