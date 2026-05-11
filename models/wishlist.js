@@ -6,7 +6,6 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
     }
   }
-<<<<<<< HEAD
   WishList.init({
     userId: DataTypes.INTEGER,
     res_id: DataTypes.INTEGER,
@@ -15,20 +14,5 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'WishList',
   });
-=======
-
-  WishList.init(
-    {
-      userId: DataTypes.INTEGER,
-      residentId: DataTypes.INTEGER,
-      liked: DataTypes.BOOLEAN,
-    },
-    {
-      sequelize,
-      modelName: "WishList",
-    },
-  );
-
->>>>>>> Sewar-Backend
   return WishList;
 };
