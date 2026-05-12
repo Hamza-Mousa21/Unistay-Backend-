@@ -91,13 +91,18 @@ const addResidence = async (req, res) => {
 
 const getAllResidences = async (req, res) => {
   try {
-    const residences = await Residence.findAll({
+    const residences = await Residence.findAll(
+      
+      {
       include: [
         {
-          model: ResidenceImage,
+          model:ResidenceImage
+          
         },
       ],
-    });
+    }
+  
+  );
 
     return res.status(200).json({
       success: true,
@@ -111,7 +116,7 @@ const getAllResidences = async (req, res) => {
       success: false,
 
       message: "Internal server error",
-    });
+    })
   }
 };
 

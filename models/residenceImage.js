@@ -14,7 +14,11 @@ module.exports = (sequelize, DataTypes) => {
 
   ResidenceImage.init(
     {
-        image_id: DataTypes.INTEGER,
+         image_id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,  
+            autoIncrement: true,
+          },
         image_url: DataTypes.STRING(500),
         res_id: DataTypes.INTEGER,
     },

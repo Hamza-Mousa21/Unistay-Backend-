@@ -8,6 +8,7 @@ const Ratingrouter=require('../routes/ratingRoutes')
 const wishListRouter=require('../routes/wishListRoutes')
 const studentRouter=require('../routes/studentAuthRoutes')
 const ownerRouter=require('../routes/ownerAuthRoutes')
+const residenceRouter=require('../routes/residenceRoutes')
 
 
 
@@ -19,7 +20,8 @@ app.use(express.json())
 
 
 app.use('/residence/:residenceId/Ratings',Ratingrouter)
-app.use('/student/:studentId/residence/:residenceId/wishlist',wishListRouter)
+app.use('/residence/:residenceId/wishlist',wishListRouter)
+app.use('/residence',residenceRouter)
 app.use('/student',studentRouter)
 app.use('/owner',ownerRouter)
 
