@@ -5,6 +5,7 @@ const {
   getAllResidences,
   updateResidence,
   deleteResidence,
+  getResidenceById
 } = require("../controllers/residenceController");
 
 const { protect, authorizeRoles } = require("../middlewares/authMiddleware");
@@ -45,6 +46,13 @@ router.get(
 
   getAllResidences,
 );
+
+
+
+router.get(
+  "/:id",
+  getResidenceById,
+)
 
 /* ================= UPDATE RESIDENCE ================= */
 

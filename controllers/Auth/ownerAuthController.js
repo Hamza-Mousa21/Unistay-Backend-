@@ -169,7 +169,7 @@ const registerOwner = async (req, res) => {
       success: false,
 
       message:
-        "Internal server error",
+        error.message,
     });
 
   }

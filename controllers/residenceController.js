@@ -52,15 +52,15 @@ const addResidence = async (req, res) => {
 
     /* ================= SAVE IMAGES ================= */
 
-    if (req.files && req.files.length > 0) {
-      const images = req.files.map((file) => ({
-        image_url: `/uploads/residences/${file.filename}`,
+    // if (req.files && req.files.length > 0) {
+    //   const images = req.files.map((file) => ({
+    //     image_url: `/uploads/residences/${file.filename}`,
 
-        res_id: residence.res_id,
-      }));
+    //     res_id: residence.res_id,
+    //   }));
 
-      await ResidenceImage.bulkCreate(images);
-    }
+    //   await ResidenceImage.bulkCreate(images);
+    // }
 
     /* ================= RESPONSE ================= */
 
@@ -126,6 +126,38 @@ const getAllResidences = async (req, res) => {
  * ==================================================
  * Allows owner to update their residence
  */
+
+const getResidenceById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const residence = await Residence.findByPk(id, {
+      include: [{ model: ResidenceImage }],
+    });
+
+    if (!residence) {
+      return res.status(404).json({
+        success: false,
+        message: "Residence not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      residence,
+    });
+
+  } catch (error) {
+    console.error("Get Residence By Id Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+
+
 
 const updateResidence = async (req, res) => {
   try {
@@ -233,4 +265,6 @@ module.exports = {
   getAllResidences,
   updateResidence,
   deleteResidence,
+  getResidenceById
+  
 };
