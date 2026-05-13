@@ -9,7 +9,7 @@ const getRatings=async(req,res)=>{
             return res.status(404).json({message:"Residence is not found!"})
         }  
         console.log(1)
-        const rate=await ratingService.getRatings()
+        const rate=await ratingService.getRatings(req.params.residenceId)
         if(rate.length===0){
             console.log(2)
             return res.status(200).json({message:"No ratings yet"})
@@ -28,18 +28,19 @@ const getRatings=async(req,res)=>{
 const postRating=async(req,res)=>{
 
     try{
-        const student=await db.Student.findByPk(req.params.studentId)
-        if(!student){
-            return res.status(401).json({message:"User not found!"})
-        }
-        const residence=await db.Residence.findByPk(req.params.residenceId)
-        if(!residence){
-            return res.status(401).json({message:"Resiedence Is not found!"})
-        }
+        // const student=await db.Student.findByPk(req.body.user_id)
+        // if(!student){
+        //     return res.status(401).json({message:"User not found!"})
+        // }
+        // const residence=await db.Residence.findByPk(req.body.res_id)
+        // if(!residence){
+        //     return res.status(401).json({message:"Resiedence Is not found!"})
+        // }
         const rate=await ratingService.postRating(req.body)
-        res.status(200).json(rate)
+        res.status(201).json(rate)
     }
-    catch{
+    catch(error){
+        console.error(error)
         res.status(500).json({message:"Server error"})
     }
 }

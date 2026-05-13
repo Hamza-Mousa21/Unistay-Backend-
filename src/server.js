@@ -19,7 +19,7 @@ app.use(cors({ origin: 'http://localhost:5173' }))
 app.use(express.json())
 
 
-app.use('/residence/:residenceId/Ratings',Ratingrouter)
+app.use('/Ratings',Ratingrouter)
 app.use('/residence/:residenceId/wishlist',wishListRouter)
 app.use('/residence',residenceRouter)
 app.use('/student',studentRouter)

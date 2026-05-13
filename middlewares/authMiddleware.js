@@ -36,7 +36,7 @@ const protect = async (req, res, next) => {
 
     const decoded = jwt.verify(
       token,
-      process.env.JWT_SECRET
+      "aB9$xK2@mL7#qR4&vN1!wP6^yZ3*uI8-jT5(sH0)eD4{fG7}"
     );
 
     /* ================= STORE USER ================= */

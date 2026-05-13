@@ -1,22 +1,21 @@
 const db=require('../models')
 
-const getRatings=async()=>{
-    const rate=await db.Rating.findAll()
+const getRatings=async(res_id)=>{
+    const rate=await db.Rating.findAll({
+        where:{res_id}
+})
     return rate
 }
 
-const postRating=async(data)=>{
-// const {userId,resId,rateDate,starCount,comment,issues}
-    const rate=await db.Rating.create({
-        userId:data.userId,
-        residentId:data.residentId,
-        rateDate:data.rateDate,
-        starCount:data.starCount,
-        comment:data.comment,
-        issues:data.issues
-        
+const postRating = async(data) => {
+    const rate = await db.Rating.create({
+        user_id: data.user_id,
+        res_id: data.res_id,
+        rateDate: data.rateDate || new Date(),  // ✅ Use provided date or current date
+        starCount: data.starCount,
+        comment: data.comment,
+        issues: data.issues
     })
-    await rate.save()
     return rate
 }
 
