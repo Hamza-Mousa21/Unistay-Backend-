@@ -6,7 +6,7 @@ const getRatings=async(req,res)=>{
     try{
         const residence=await db.Residence.findByPk(req.params.residenceId)
         if (!residence){
-            return res.status(401).json({message:"Residence is not found!"})
+            return res.status(404).json({message:"Residence is not found!"})
         }  
         console.log(1)
         const rate=await ratingService.getRatings()

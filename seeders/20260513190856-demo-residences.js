@@ -10,7 +10,7 @@ module.exports = {
         address: "123 Main Street, Nablus",
         rent_price: 500.00,
         building_num: "A1",
-        owner_id: 1, 
+        owner_id: 1, // 👈 must match an existing user_id in Users table
       },
       {
         description: "Studio apartment with great view",
