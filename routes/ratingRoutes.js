@@ -6,7 +6,7 @@ const { protect, authorizeRoles } = require("../middlewares/authMiddleware");
 
 
 router.get('/residence/:residenceId',ratingController.getRatings)
-router.post('/',protect,authorizeRoles("student"),ratingController.postRating)
+router.post('/residence/:residenceId',protect,authorizeRoles("student"),ratingController.postRating)
 router.delete('/:id/student/:studentId/',protect,authorizeRoles("student"),ratingController.deleteRating)
 //reminder: I will make an authorize for the stu Id to only him delete it
 
