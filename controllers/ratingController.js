@@ -8,13 +8,10 @@ const getRatings=async(req,res)=>{
         if (!residence){
             return res.status(404).json({message:"Residence is not found!"})
         }  
-        console.log(1)
         const rate=await ratingService.getRatings(req.params.residenceId)
         if(rate.length===0){
-            console.log(2)
             return res.status(200).json({message:"No ratings yet"})
         }
-        console.log(3)
         res.status(200).json(rate)
     }
     catch(error){
@@ -30,11 +27,11 @@ const postRating=async(req,res)=>{
     try{
         const student=await db.Student.findByPk(req.body.user_id)
         if(!student){
-            return res.status(401).json({message:"User not found!"})
+            return res.status(404).json({message:"User not found!"})
         }
         const residence=await db.Residence.findByPk(req.body.res_id)
         if(!residence){
-            return res.status(401).json({message:"Resiedence Is not found!"})
+            return res.status(404).json({message:"Resiedence Is not found!"})
         }
         const rate=await ratingService.postRating(req.body)
         res.status(201).json(rate)
@@ -48,13 +45,19 @@ const postRating=async(req,res)=>{
 
 const deleteRating=async(req,res)=>{
     try{
-        const student=await db.Student.findByPk(req.params.studentId)
-        if(!student){
-            return res.status(401).json({message:"User not found!"})
+        const rating = await db.Rating.findByPk(req.params.id)
+
+        if (!rating) {
+            res.status(404).json({ message: "Rating not found" })
         }
-        const residence=await db.Residence.findByPk(req.params.residenceId)
-        if(!residence){
-            return res.status(401).json({message:"Resiedence Is not found!"})
+
+        const residence = await db.Residence.findByPk(rating.res_id)
+        if (!residence) {
+            res.status(404).json({ message: "Residence not found" })
+        }
+
+        if (rating.user_id !== req.user.id) {
+            return res.status(403).json({ message: "Access denied" })
         }
 
 
@@ -76,15 +79,20 @@ const deleteRating=async(req,res)=>{
 
 const updateRating=async(req,res)=>{
     try{
-        const student=await db.Student.findByPk(req.params.studentId)
-        if(!student){
-            return res.status(401).json({message:"User not found!"})
-        }
-        const residence=await db.Residence.findByPk(req.params.residenceId)
-        if(!residence){
-            return res.status(401).json({message:"Resiedence Is not found!"})
+          const rating = await db.Rating.findByPk(req.params.id)
+
+        if (!rating) {
+            res.status(404).json({ message: "Rating not found" })
         }
 
+        const residence = await db.Residence.findByPk(rating.res_id)
+        if (!residence) {
+            res.status(404).json({ message: "Residence not found" })
+        }
+
+        if (rating.user_id !== req.user.id) {
+            return res.status(403).json({ message: "Access denied" })
+        }
 
         const rate=await ratingService.updateRating(req.params,req.body)
         if(rate==null){
@@ -98,41 +106,49 @@ const updateRating=async(req,res)=>{
 }
 
 
-const deleteComment=async(req,res)=>{
-    try{
-         const student=await db.Student.findByPk(req.params.studentId)
-        if(!student){
-            return res.status(401).json({message:"User not found!"})
-        }
-        const residence=await db.Residence.findByPk(req.params.residenceId)
-        if(!residence){
-            return res.status(401).json({message:"Resiedence Is not found!"})
-        }
+const deleteComment = async (req, res) => {
+  try {
+    const rating = await db.Rating.findByPk(req.params.id)
 
-
-        const rate=await ratingService.deleteComment(req.params)
-        if (rate===null){
-            res.status(201).json({message:"Comment was NOT deleted!"})
-        }
-        res.status(201).json({message:"Comment deleted"})
-    }
-    catch{
-        res.status(500).json({message:"Server error"})
+    if (!rating) {
+      return res.status(404).json({ message: "Rating not found" })
     }
 
+    const residence = await db.Residence.findByPk(rating.res_id)
+    if (!residence) {
+      return res.status(404).json({ message: "Residence not found" })
+    }
 
+    if (rating.user_id !== req.user.id) {
+      return res.status(403).json({ message: "Access denied" })
+    }
+
+    const result = await ratingService.deleteComment(req.params)
+    return res.status(200).json({ message: "Comment deleted successfully" })
+
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ message: "Server error" })
+  }
 }
 
 
 const deleteIssue=async(req,res)=>{
     try{
-        const student=await db.Student.findByPk(req.params.studentId)
-        if(!student){
-            return res.status(401).json({message:"User not found!"})
+        const rating = await db.Rating.findByPk(req.params.id)
+
+        if (!rating) {
+        return res.status(404).json({ message: "Rating not found" })
         }
-        const residence=await db.Residence.findByPk(req.params.residenceId)
-        if(!residence){
-            return res.status(401).json({message:"Resiedence Is not found!"})
+
+
+        const residence = await db.Residence.findByPk(rating.res_id)
+        if (!residence) {
+        return res.status(404).json({ message: "Residence not found" })
+        }
+
+        if (rating.user_id !== req.user.id) {
+        return res.status(403).json({ message: "Access denied" })
         }
 
 
@@ -147,6 +163,32 @@ const deleteIssue=async(req,res)=>{
     }
 }
 
+const upsertStarCount = async (req, res) => {
+    try {
+        const residence = await db.Residence.findByPk(req.body.res_id)
+        if (!residence) {
+            return res.status(404).json({ message: "Residence not found" })
+        }
+
+        const student = await db.Student.findByPk(req.user.id)
+        if (!student) {
+            return res.status(404).json({ message: "Student not found" })
+        }
+
+        const rate = await ratingService.upsertStarCount(
+            req.user.id,
+            req.body.res_id,
+            req.body.starCount
+        )
+
+        res.status(200).json(rate)
+    }
+    catch (error) {
+        console.error(error)
+        res.status(500).json({ message: "Server error" })
+    }
+}
+
 
 
 
@@ -156,5 +198,6 @@ module.exports={
     updateRating,
     deleteRating,
     deleteComment,
-    deleteIssue
+    deleteIssue,
+    upsertStarCount
 }

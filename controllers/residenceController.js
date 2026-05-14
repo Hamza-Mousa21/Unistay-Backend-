@@ -132,7 +132,9 @@ const getResidenceById = async (req, res) => {
     const { id } = req.params;
 
     const residence = await Residence.findByPk(id, {
-      include: [{ model: ResidenceImage }],
+      include: [{ model: ResidenceImage },
+        { model: db.Rating }
+      ],
     });
 
     if (!residence) {
