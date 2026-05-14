@@ -1,28 +1,38 @@
 const db=require('../models')
 
-const getWishedList=async()=>{
-    const wish=await db.WishList.findAll()
-    return wish
+const getWishedList = async (user_id) => {
+    return await db.WishList.findAll({
+        where: { user_id },
+        include: [
+            {
+                model: db.Residence,
+                include: [
+                    { model: db.ResidenceImage } 
+                ]
+            }
+        ]
+    })
+    
 }
 
 
-const addToWishList=async(Data)=>{
-    const wish =await db.WishList.create({
-        liked:Data.liked,
-        userId:Data.userId,
-        residentId:Data.residentId
+const addToWishList = async (user_id, res_id) => {
+    const wish = await db.WishList.create({
+        liked: true,
+        user_id,
+        res_id
     })
     return wish
 }
 
-const removeFromWishList=async(Data)=>{
-    const wish=await db.WishList.findByPk(Data.id)
-    if(!wish){
-        return null
-    }
+
+const removeFromWishList = async (user_id, res_id) => {
+    const wish = await db.WishList.findOne({
+        where: { user_id, res_id }
+    })
+    if (!wish) return null
     await wish.destroy()
     return true
-
 }
 
 

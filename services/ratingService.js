@@ -78,26 +78,7 @@ const updateRating=async(parameter,data)=>{
     return true
 }
 
-const upsertStarCount = async (user_id, res_id, starCount) => {
-    const existing = await db.Rating.findOne({
-        where: { user_id, res_id }
-    })
 
-    if (existing) {
-        await existing.update({ starCount })
-        return existing
-    }
-
-    const rate = await db.Rating.create({
-        user_id,
-        res_id,
-        starCount,
-        comment: null,
-        issues: null,
-        rateDate: new Date()
-    })
-    return rate
-}
 
 
 module.exports={
@@ -106,8 +87,7 @@ module.exports={
     deleteRating,
     deleteComment,
     deleteIssue,
-    updateRating,
-    upsertStarCount
+    updateRating
 
 }
 
