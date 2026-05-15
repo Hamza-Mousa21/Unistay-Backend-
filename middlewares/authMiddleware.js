@@ -17,8 +17,7 @@ const protect = async (req, res, next) => {
       req.headers.authorization &&
       req.headers.authorization.startsWith("Bearer")
     ) {
-      token =
-        req.headers.authorization.split(" ")[1];
+      token = req.headers.authorization.split(" ")[1];
     }
 
     /* ================= CHECK TOKEN ================= */
@@ -26,34 +25,24 @@ const protect = async (req, res, next) => {
     if (!token) {
       return res.status(401).json({
         success: false,
-
-        message:
-          "Not authorized, no token",
+        message: "Not authorized, no token",
       });
     }
 
     /* ================= VERIFY TOKEN ================= */
 
-    const decoded = jwt.verify(
-      token,
-      "aB9$xK2@mL7#qR4&vN1!wP6^yZ3*uI8-jT5(sH0)eD4{fG7}"
-    );
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     /* ================= STORE USER ================= */
 
     req.user = decoded;
 
     next();
-
   } catch (error) {
-
     return res.status(401).json({
       success: false,
-
-      message:
-        "Not authorized, invalid token",
+      message: "Not authorized, invalid token",
     });
-
   }
 };
 
@@ -70,29 +59,18 @@ const protect = async (req, res, next) => {
  */
 
 const authorizeRoles = (...roles) => {
-
   return (req, res, next) => {
-
     /* ================= CHECK USER ROLE ================= */
 
-    if (
-      !req.user ||
-      !roles.includes(req.user.role)
-    ) {
-
+    if (!req.user || !roles.includes(req.user.role)) {
       return res.status(403).json({
         success: false,
-
-        message:
-          "Access denied",
+        message: "Access denied",
       });
-
     }
 
     next();
-
   };
-
 };
 
 module.exports = {
