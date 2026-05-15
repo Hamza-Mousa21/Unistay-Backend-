@@ -3,7 +3,7 @@ const db = require('../models')
 
 const getAllWishedList = async (req, res) => {
     try {
-        const student = await db.Student.findByPk(req.user.id)
+        const student = await db.Student.findOne({ where: { user_id: req.user.id } })
         if (!student) {
             return res.status(404).json({ message: "Student not found" })
         }
@@ -23,7 +23,7 @@ const getAllWishedList = async (req, res) => {
 
 const getWishlistByResId = async (req, res) => {
     try {
-        const student = await db.Student.findByPk(req.user.id)
+         const student = await db.Student.findOne({ where: { user_id: req.user.id } })
         if (!student) {
             return res.status(404).json({ message: "Student not found" })
         }
@@ -45,7 +45,7 @@ const getWishlistByResId = async (req, res) => {
 
 const addToWishlist = async (req, res) => {
     try {
-        const student = await db.Student.findByPk(req.user.id)
+         const student = await db.Student.findOne({ where: { user_id: req.user.id } })
         if (!student) {
             return res.status(404).json({ message: "Student not found" })
         }
@@ -66,7 +66,7 @@ const addToWishlist = async (req, res) => {
 
 const removeFromWishlist = async (req, res) => {
     try {
-        const student = await db.Student.findByPk(req.user.id)
+        const student = await db.Student.findOne({ where: { user_id: req.user.id } })
         if (!student) {
             return res.status(404).json({ message: "Student not found" })
         }
