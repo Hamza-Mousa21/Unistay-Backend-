@@ -6,6 +6,7 @@ const {
   getOwnerProfile,
   updateOwnerProfile,
   deleteOwnerProfile,
+  getOwnerContactInfo,
 } = require("../controllers/Auth/ownerAuthController");
 
 const {
@@ -43,6 +44,7 @@ router.post(
   loginOwner
 );
 
+
 /* ================= GET OWNER PROFILE ================= */
 
 router.get(
@@ -54,6 +56,12 @@ router.get(
 
   getOwnerProfile
 );
+
+
+
+router.get("/:owner_id/info", getOwnerContactInfo);
+
+
 
 /* ================= UPDATE OWNER PROFILE ================= */
 

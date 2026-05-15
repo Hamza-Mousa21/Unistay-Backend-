@@ -5,7 +5,8 @@ const {
   getAllResidences,
   updateResidence,
   deleteResidence,
-  getResidenceById
+  getResidenceById,
+  searchResidences
 } = require("../controllers/residenceController");
 
 const { protect, authorizeRoles } = require("../middlewares/authMiddleware");
@@ -38,6 +39,8 @@ router.post(
 
   addResidence,
 );
+
+router.post("/search", searchResidences)
 
 /* ================= GET ALL RESIDENCES ================= */
 
