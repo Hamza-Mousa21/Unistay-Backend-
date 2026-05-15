@@ -24,11 +24,11 @@ app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 
-app.use("/residence/:residenceId/Ratings", Ratingrouter);
-app.use("/residence/:residenceId/wishlist", wishListRouter);
-app.use("/residence", residenceRouter);
-app.use("/student", studentRouter);
-app.use("/owner", ownerRouter);
+app.use('/Ratings',Ratingrouter)
+app.use('/wishlist',wishListRouter)
+app.use('/residence',residenceRouter)
+app.use('/student',studentRouter)
+app.use('/owner',ownerRouter)
 
 app.listen(PORT, () => {
   console.log("Server is running");

@@ -169,7 +169,7 @@ const registerOwner = async (req, res) => {
       success: false,
 
       message:
-        "Internal server error",
+        error.message,
     });
 
   }
@@ -516,10 +516,51 @@ const deleteOwnerProfile = async (
   }
 };
 
+
+const getOwnerContactInfo = async (req, res) => {
+  try {
+    const { owner_id } = req.params;
+
+    const owner = await db.Owner.findOne({
+      where: { user_id: owner_id },
+      attributes: ["phone_num"],
+      include: [
+        {
+          model: db.User,
+          attributes: ["first_name", "last_name"],
+        },
+      ],
+    });
+
+    if (!owner) {
+      return res.status(404).json({
+        success: false,
+        message: "Owner not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      phone_num: owner.phone_num,
+      first_name: owner.User.first_name,
+      last_name: owner.User.last_name,
+    });
+
+  } catch (error) {
+    console.error("Get Owner Contact Info Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+
 module.exports = {
   registerOwner,
   loginOwner,
   getOwnerProfile,
   updateOwnerProfile,
   deleteOwnerProfile,
+  getOwnerContactInfo
 };

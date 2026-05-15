@@ -8,10 +8,13 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey:"user_id",
         onDelete:"CASCADE"
       })
+
+      WishList.belongsTo(models.Residence, { foreignKey: "res_id" }) 
+      
     }
   }
   WishList.init({
-    user_Id: DataTypes.INTEGER,
+    user_id: DataTypes.INTEGER,
     res_id: DataTypes.INTEGER,
     liked: DataTypes.BOOLEAN
   }, {

@@ -6,6 +6,8 @@ const {
   getResidenceById,
   updateResidence,
   deleteResidence,
+ 
+  searchResidences
 } = require("../controllers/residenceController");
 
 const { protect, authorizeRoles } = require("../middlewares/authMiddleware");
@@ -43,6 +45,23 @@ router.post(
   upload.array("images", 5),
   addResidence,
 );
+
+router.post("/search", searchResidences)
+
+/* ================= GET ALL RESIDENCES ================= */
+
+router.get(
+  "/",
+
+  getAllResidences,
+);
+
+
+
+router.get(
+  "/:id",
+  getResidenceById,
+)
 
 /* ================= UPDATE RESIDENCE ================= */
 
