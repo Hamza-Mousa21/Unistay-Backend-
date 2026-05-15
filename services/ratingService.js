@@ -11,7 +11,7 @@ const postRating = async(data) => {
     const rate = await db.Rating.create({
         user_id: data.user_id,
         res_id: data.res_id,
-        rateDate: data.rateDate || new Date(),  // ✅ Use provided date or current date
+        rateDate: data.rateDate || new Date(), 
         starCount: data.starCount,
         comment: data.comment,
         issues: data.issues
