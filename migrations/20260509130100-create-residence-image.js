@@ -19,10 +19,15 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: "Residence", 
+          model: "Residence",
           key: "res_id",
         },
         onDelete: "CASCADE",
+      },
+
+      is_primary: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
       },
     });
   },

@@ -3,6 +3,8 @@ const express = require("express");
 const app = express();
 const db = require("../models");
 const cors = require("cors");
+const path = require("path");
+const fs = require("fs");
 const Ratingrouter = require("../routes/ratingRoutes");
 const wishListRouter = require("../routes/wishListRoutes");
 const studentRouter = require("../routes/studentAuthRoutes");
@@ -11,8 +13,16 @@ const residenceRouter = require("../routes/residenceRoutes");
 
 const PORT = 3000;
 
+
+fs.mkdirSync("uploads/residences", { recursive: true });
+
+
 app.use(cors({ origin: "http://localhost:5173" }));
 app.use(express.json());
+
+
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+
 
 app.use("/residence/:residenceId/Ratings", Ratingrouter);
 app.use("/residence/:residenceId/wishlist", wishListRouter);

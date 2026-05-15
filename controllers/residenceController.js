@@ -11,52 +11,92 @@ const { Residence, ResidenceImage } = db;
 
 const addResidence = async (req, res) => {
   try {
-    const { description, floor_num, address, rent_price, building_num } =
-      req.body;
+    const {
+      title,
+      description,
+      housing_type,
+      available_for,
+      address,
+      neighborhood,
+      rent_price,
+      distance_from_university,
+      floor_num,
+      building_num,
+      capacity,
+      rooms,
+      bathrooms,
+      wifi,
+      parking,
+      security,
+    } = req.body;
 
     /* ================= VALIDATION ================= */
 
-    if (!address || !rent_price) {
+    if (
+      !title ||
+      !housing_type ||
+      !available_for ||
+      !address ||
+      !rent_price ||
+      !distance_from_university
+    ) {
       return res.status(400).json({
         success: false,
-
-        message: "Address and rent price are required",
+        message:
+          "يرجى تعبئة المعلومات الأساسية والعنوان والسعر والمسافة قبل النشر",
       });
     }
 
     if (Number(rent_price) <= 0) {
       return res.status(400).json({
         success: false,
-
         message: "Rent price must be greater than zero",
+      });
+    }
+
+    /* ================= GET OWNER ================= */
+
+    const owner = await db.Owner.findOne({
+      where: { user_id: req.user.id },
+    });
+
+    if (!owner) {
+      return res.status(404).json({
+        success: false,
+        message: "Owner not found",
       });
     }
 
     /* ================= CREATE RESIDENCE ================= */
 
     const residence = await Residence.create({
+      owner_id: owner.user_id, // ✅ من جدول Owner مش من JWT
+      title,
       description: description || null,
-
-      is_available: true,
-
-      floor_num: floor_num || null,
-
+      housing_type,
+      available_for,
       address,
-
+      neighborhood: neighborhood || null,
       rent_price,
-
+      distance_from_university,
+      floor_num: floor_num || null,
       building_num: building_num || null,
-
-      owner_id: req.user.id,
+      capacity: capacity || null,
+      rooms: rooms || null,
+      bathrooms: bathrooms || null,
+      wifi: wifi === "true" || wifi === true,
+      parking: parking === "true" || parking === true,
+      security: security === "true" || security === true,
+      is_available: true,
     });
 
     /* ================= SAVE IMAGES ================= */
 
     if (req.files && req.files.length > 0) {
-      const images = req.files.map((file) => ({
+      const images = req.files.map((file, index) => ({
         image_url: `/uploads/residences/${file.filename}`,
-
         res_id: residence.res_id,
+        is_primary: index === 0,
       }));
 
       await ResidenceImage.bulkCreate(images);
@@ -66,9 +106,7 @@ const addResidence = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-
       message: "Residence added successfully",
-
       residence,
     });
   } catch (error) {
@@ -76,7 +114,6 @@ const addResidence = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-
       message: "Internal server error",
     });
   }
@@ -86,27 +123,26 @@ const addResidence = async (req, res) => {
  * ==================================================
  * GET ALL RESIDENCES
  * ==================================================
- * Returns all available residences
+ * Returns all available residences with their images
  */
 
 const getAllResidences = async (req, res) => {
   try {
-    const residences = await Residence.findAll(
-      
-      {
+    const residences = await Residence.findAll({
+      where: { is_available: true },
       include: [
         {
-          model:ResidenceImage
-          
+          model: ResidenceImage,
+          as: "ResidenceImages",
+          attributes: ["image_id", "image_url", "is_primary"],
         },
       ],
-    }
-  
-  );
+      order: [["res_id", "DESC"]],
+    });
 
     return res.status(200).json({
       success: true,
-
+      count: residences.length,
       residences,
     });
   } catch (error) {
@@ -114,9 +150,50 @@ const getAllResidences = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-
       message: "Internal server error",
-    })
+    });
+  }
+};
+
+/**
+ * ==================================================
+ * GET SINGLE RESIDENCE
+ * ==================================================
+ * Returns a single residence by ID
+ */
+
+const getResidenceById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const residence = await Residence.findByPk(id, {
+      include: [
+        {
+          model: ResidenceImage,
+          as: "ResidenceImages",
+          attributes: ["image_id", "image_url", "is_primary"],
+        },
+      ],
+    });
+
+    if (!residence) {
+      return res.status(404).json({
+        success: false,
+        message: "Residence not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      residence,
+    });
+  } catch (error) {
+    console.error("Get Residence By ID Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 };
 
@@ -138,17 +215,19 @@ const updateResidence = async (req, res) => {
     if (!residence) {
       return res.status(404).json({
         success: false,
-
         message: "Residence not found",
       });
     }
 
     /* ================= OWNER CHECK ================= */
 
-    if (residence.owner_id !== req.user.id) {
+    const owner = await db.Owner.findOne({
+      where: { user_id: req.user.id },
+    });
+
+    if (!owner || residence.owner_id !== owner.user_id) {
       return res.status(403).json({
         success: false,
-
         message: "Access denied",
       });
     }
@@ -159,9 +238,7 @@ const updateResidence = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-
       message: "Residence updated successfully",
-
       residence,
     });
   } catch (error) {
@@ -169,7 +246,6 @@ const updateResidence = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-
       message: "Internal server error",
     });
   }
@@ -193,17 +269,19 @@ const deleteResidence = async (req, res) => {
     if (!residence) {
       return res.status(404).json({
         success: false,
-
         message: "Residence not found",
       });
     }
 
     /* ================= OWNER CHECK ================= */
 
-    if (residence.owner_id !== req.user.id) {
+    const owner = await db.Owner.findOne({
+      where: { user_id: req.user.id },
+    });
+
+    if (!owner || residence.owner_id !== owner.user_id) {
       return res.status(403).json({
         success: false,
-
         message: "Access denied",
       });
     }
@@ -214,7 +292,6 @@ const deleteResidence = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-
       message: "Residence deleted successfully",
     });
   } catch (error) {
@@ -222,7 +299,6 @@ const deleteResidence = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-
       message: "Internal server error",
     });
   }
@@ -231,6 +307,7 @@ const deleteResidence = async (req, res) => {
 module.exports = {
   addResidence,
   getAllResidences,
+  getResidenceById,
   updateResidence,
   deleteResidence,
 };
