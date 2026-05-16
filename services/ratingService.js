@@ -79,7 +79,17 @@ const updateRating=async(parameter,data)=>{
 }
 
 
-
+const upsertStarCount = async (user_id, res_id, starCount) => {
+    const rate = await db.Rating.create({
+        user_id,
+        res_id,
+        rateDate: new Date(),
+        starCount,
+        comment: null,
+        issues: null
+    })
+    return rate
+}
 
 module.exports={
     getRatings,
@@ -87,7 +97,8 @@ module.exports={
     deleteRating,
     deleteComment,
     deleteIssue,
-    updateRating
+    updateRating,
+    upsertStarCount
 
 }
 

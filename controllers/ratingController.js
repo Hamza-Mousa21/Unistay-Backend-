@@ -190,6 +190,62 @@ const upsertStarCount = async (req, res) => {
 }
 
 
+const getStudentStarCount = async (req, res) => {
+    try {
+        const { residenceId } = req.params
+
+        const rating = await db.Rating.findOne({
+            where: {
+                user_id: req.user.id,
+                res_id: residenceId,
+                starCount: { [require('sequelize').Op.ne]: null }
+            },
+            order: [['rateDate', 'DESC']],  
+        })
+
+        if (!rating) {
+            return res.status(404).json({ message: "No star rating found" })
+        }
+
+        return res.status(200).json({ starCount: rating.starCount })
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ message: "Server error" })
+    }
+}
+
+const getAverageStarCount = async (req, res) => {
+    try {
+        const { residenceId } = req.params
+
+        const residence = await db.Residence.findByPk(residenceId)
+        if (!residence) {
+            return res.status(404).json({ message: "Residence not found" })
+        }
+
+        const result = await db.Rating.findOne({
+            where: {
+                res_id: residenceId,
+                starCount: { [require('sequelize').Op.ne]: null }
+            },
+            attributes: [
+                [db.sequelize.fn('AVG', db.sequelize.col('starCount')), 'average'],
+                [db.sequelize.fn('COUNT', db.sequelize.col('starCount')), 'total']
+            ],
+            raw: true
+        })
+
+        return res.status(200).json({
+            average: result.average ? parseFloat(result.average).toFixed(1) : null,
+            total: parseInt(result.total)
+        })
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({ message: "Server error" })
+    }
+}
+
+
 
 
 module.exports={
@@ -199,5 +255,7 @@ module.exports={
     deleteRating,
     deleteComment,
     deleteIssue,
-    upsertStarCount
+    upsertStarCount,
+    getStudentStarCount,
+    getAverageStarCount
 }

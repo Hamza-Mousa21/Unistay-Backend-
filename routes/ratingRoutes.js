@@ -11,6 +11,8 @@ router.delete('/:id/student/:studentId/',protect,authorizeRoles("student"),ratin
 router.post("/star", protect, authorizeRoles("student"), ratingController.upsertStarCount)
 router.delete('/comment/:id',protect,authorizeRoles("student"),ratingController.deleteComment)
 router.delete('/issue/:id',protect,authorizeRoles("student"),ratingController.deleteIssue)
+router.get('/residence/:residenceId/my-star', protect,authorizeRoles("student"), ratingController.getStudentStarCount)
+router.get('/residence/:residenceId/average', ratingController.getAverageStarCount)
 
 router.put('/:id',protect,authorizeRoles("student"),ratingController.updateRating)
 
