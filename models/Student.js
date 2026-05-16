@@ -1,66 +1,58 @@
-"use strict";
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
-const { Model } = require("sequelize");
-
-module.exports = (sequelize, DataTypes) => {
-  class Student extends Model {
-    static associate(models) {
-      // Each student belongs to one user
-      Student.belongsTo(models.User, {
-        foreignKey: "user_id",
-        onDelete: "CASCADE",
-      });
-      Student.hasMany(models.Rating,{
-        foreignKey:"user_id",
-        onDelete: "CASCADE"
-      })
-      Student.hasMany(models.WishList,{
-        foreignKey:"user_id",
-        onDelete:"CASCADE"
-      })
-    }
-  }
-
-  Student.init(
-    {
-      user_id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        allowNull: false,
-      },
-
-      major: {
-        type: DataTypes.STRING(100),
-        allowNull: true,
-      },
-
-      year_of_study: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-
-        validate: {
-          min: 1,
-          max: 6,
-        },
-      },
-
-      gender: {
-        type: DataTypes.ENUM("male", "female", "other"),
-
-        allowNull: true,
-      },
+const studentSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "الاسم مطلوب"],
+      trim: true,
     },
-
-    {
-      sequelize,
-
-      modelName: "Student",
-
-      tableName: "Students",
-
-      timestamps: false,
+    email: {
+      type: String,
+      required: [true, "البريد الإلكتروني مطلوب"],
+      unique: true,
+      lowercase: true,
+      trim: true,
     },
-  );
+    password: {
+      type: String,
+      required: [true, "كلمة المرور مطلوبة"],
+      minlength: 6,
+      select: false,
+    },
+    university: {
+      type: String,
+      required: [true, "اسم الجامعة مطلوب"],
+      trim: true,
+    },
+    property: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Property",
+      default: null,
+    },
+    status: {
+      type: String,
+      enum: ["نشط", "معلق", "محظور"],
+      default: "نشط",
+    },
+    joinedAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
+  { timestamps: true }
+);
 
-  return Student;
+// Hash password before saving
+studentSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
+
+studentSchema.methods.matchPassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
 };
+
+module.exports = mongoose.model("Student", studentSchema);

@@ -1,30 +1,26 @@
+const express = require("express");
+const cors = require("cors");
+const dotenv = require("dotenv");
 
+const connectDB = require("../config/db");
 
-const express=require('express')
-const app=express()
-const db=require('../models')
-const cors =require('cors')
-const Ratingrouter=require('../routes/ratingRoutes')
-const wishListRouter=require('../routes/wishListRoutes')
-const studentRouter=require('../routes/studentAuthRoutes')
-const ownerRouter=require('../routes/ownerAuthRoutes')
-const residenceRouter=require('../routes/residenceRoutes')
+dotenv.config();
 
+connectDB();
 
+const app = express();
 
-const PORT=3000;
+app.use(cors());
+app.use(express.json());
 
+app.use("/api/students", require("../routes/studentRoutes"));
+app.use("/api/owners", require("../routes/ownerRoutes"));
+app.use("/api/properties", require("../routes/propertyRoutes"));
+app.use("/api/requests", require("../routes/requestRoutes"));
+app.use("/api/dashboard", require("../routes/dashboardRoutes"));
 
-app.use(cors({ origin: 'http://localhost:5173' }))
-app.use(express.json())
+const PORT = process.env.PORT || 5000;
 
-
-app.use('/residence/:residenceId/Ratings',Ratingrouter)
-app.use('/residence/:residenceId/wishlist',wishListRouter)
-app.use('/residence',residenceRouter)
-app.use('/student',studentRouter)
-app.use('/owner',ownerRouter)
-
-app.listen(PORT,()=>{
-    console.log("Server is running")
-})
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
