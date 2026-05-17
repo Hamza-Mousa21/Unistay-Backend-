@@ -1,4 +1,6 @@
+const { Op } = require("sequelize");
 const db = require("../models");
+
 
 const { Residence, ResidenceImage } = db;
 
@@ -194,10 +196,32 @@ const addResidence = async (req, res) => {
  * Returns all available residences with their images
  */
 
+
 const getAllResidences = async (req, res) => {
   try {
+    const { minPrice, maxPrice, maxDistance, wifi, security, parking } = req.query
+
+    const where = { is_available: true }
+
+    // price filter
+    if (minPrice && maxPrice) {
+      where.rent_price = { [Op.between]: [parseFloat(minPrice), parseFloat(maxPrice)] }
+    } else if (minPrice) {
+      where.rent_price = { [Op.gte]: parseFloat(minPrice) }
+    }
+
+    // distance filter
+    if (maxDistance) {
+      where.distance_from_university = { [Op.lte]: parseInt(maxDistance) }
+    }
+
+    // amenities filter
+    if (wifi === "true")     where.wifi = true
+    if (security === "true") where.security = true
+    if (parking === "true")  where.parking = true
+
     const residences = await Residence.findAll({
-      where: { is_available: true },
+      where,
       include: [
         {
           model: ResidenceImage,
@@ -215,7 +239,6 @@ const getAllResidences = async (req, res) => {
     });
   } catch (error) {
     console.error("Get Residences Error:", error);
-
     return res.status(500).json({
       success: false,
       message: "Internal server error",

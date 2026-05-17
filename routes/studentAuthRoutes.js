@@ -16,67 +16,136 @@ const {
 const router = express.Router();
 
 /**
- * ==================================================
- * STUDENT AUTHENTICATION ROUTES
- * ==================================================
- * POST   /register -> Register new student
- * POST   /login    -> Login student
- * GET    /profile  -> Get student profile
- * PUT    /profile  -> Update student profile
- * DELETE /profile  -> Delete student account
- * ==================================================
+ * @swagger
+ * tags:
+ *   name: Student
+ *   description: Student authentication and profile management
  */
 
-/* ================= REGISTER ================= */
+/**
+ * @swagger
+ * /student/register:
+ *   post:
+ *     summary: Register a new student
+ *     tags: [Student]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - password
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Student registered successfully
+ *       400:
+ *         description: Validation error
+ */
+router.post("/register", registerStudent);
 
-router.post(
-  "/register",
+/**
+ * @swagger
+ * /student/login:
+ *   post:
+ *     summary: Login a student
+ *     tags: [Student]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login successful, returns JWT token
+ *       401:
+ *         description: Invalid credentials
+ */
+router.post("/login", loginStudent);
 
-  registerStudent
-);
+/**
+ * @swagger
+ * /student/profile:
+ *   get:
+ *     summary: Get student profile
+ *     tags: [Student]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Student profile data
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - students only
+ */
+router.get("/profile", protect, authorizeRoles("student"), getStudentProfile);
 
-/* ================= LOGIN ================= */
+/**
+ * @swagger
+ * /student/profile:
+ *   put:
+ *     summary: Update student profile
+ *     tags: [Student]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Profile updated successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - students only
+ */
+router.put("/profile", protect, authorizeRoles("student"), updateStudentProfile);
 
-router.post(
-  "/login",
-
-  loginStudent
-);
-
-/* ================= GET PROFILE ================= */
-
-router.get(
-  "/profile",
-
-  protect,
-
-  authorizeRoles("student"),
-
-  getStudentProfile
-);
-
-/* ================= UPDATE PROFILE ================= */
-
-router.put(
-  "/profile",
-
-  protect,
-
-  authorizeRoles("student"),
-
-  updateStudentProfile
-);
-
-/* ================= DELETE PROFILE ================= */
-
-router.delete(
-  "/profile",
-
-  protect,
-
-  authorizeRoles("student"),
-
-  deleteStudentProfile
-);
+/**
+ * @swagger
+ * /student/profile:
+ *   delete:
+ *     summary: Delete student account
+ *     tags: [Student]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Account deleted successfully
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - students only
+ */
+router.delete("/profile", protect, authorizeRoles("student"), deleteStudentProfile);
 
 module.exports = router;
